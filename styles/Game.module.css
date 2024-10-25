@@ -35,7 +35,6 @@
   .gameItem:hover {
     background-color: #555;
   }
-  
   .selected {
     background-color: #00aaff;
   }

@@ -83,8 +83,12 @@ export default function SelectGame() {
         {games.map((game, index) => (
           <li
             key={index}
-            className={`${styles.gameItem} ${selectedGame === game ? styles.selected : ''}`}
-            onClick={() => handleSelectGame(game)}
+            className={`${styles.gameItem} ${selectedGame === game ? styles.selected : ''}`}  // Apply 'selected' class if selected
+            onClick={() => handleSelectGame(game)}  // Handle game selection on click
+            onTouchEnd={(e) => {
+              e.preventDefault();  // Ensure the touch event is processed
+              handleSelectGame(game);  // Handle game selection on touch
+            }}
           >
             {game}
           </li>

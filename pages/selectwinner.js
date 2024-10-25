@@ -126,16 +126,25 @@ export default function SelectWinner() {
         <button
           className={`${styles.teamButton} ${winner === 'Team A' ? styles.selected : ''}`}
           onClick={() => handleWinnerSelection('Team A')}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            handleWinnerSelection('Team A');
+          }}
         >
           Team A
         </button>
         <button
           className={`${styles.teamButton} ${winner === 'Team B' ? styles.selected : ''}`}
           onClick={() => handleWinnerSelection('Team B')}
+          onTouchEnd={(e) => {
+            e.preventDefault();
+            handleWinnerSelection('Team B');
+          }}
         >
           Team B
         </button>
       </div>
+
       
       <button
         className={styles.confirmButton}

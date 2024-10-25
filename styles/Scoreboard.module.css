@@ -1,0 +1,35 @@
+.container {
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    height: 100vh;
+  }
+  
+  .teamScores {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .playersSection {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .column {
+    width: 45%;
+  }
+  
+  .playerList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .playerList li {
+    padding: 10px;
+    background-color: #444;
+    margin: 5px 0;
+    border-radius: 5px;
+  }
+  

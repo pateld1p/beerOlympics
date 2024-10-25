@@ -130,7 +130,7 @@ export default function Scoreboard() {
             {sortedPlayersA.map((player) => (
               <li key={`A-${player.id}`} className={styles.playerItem}>
                 <div className={styles.playerInfo}>
-                  {player.name} - <span className={styles.score}>Score: {player.score || 0}</span>
+                  {player.name}<span className={styles.score}>Score: {player.score || 0}</span>
                 </div>
                 <div className={styles.counter}>
                   <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
@@ -149,7 +149,7 @@ export default function Scoreboard() {
             {sortedPlayersB.map((player) => (
               <li key={`B-${player.id}`} className={styles.playerItem}>
                 <div className={styles.playerInfo}>
-                  {player.name} - <span className={styles.score}>Score: {player.score || 0}</span>
+                  {player.name}<span className={styles.score}>Score: {player.score || 0}</span>
                 </div>
                 <div className={styles.counter}>
                   <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>

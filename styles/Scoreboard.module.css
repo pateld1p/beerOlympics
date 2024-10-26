@@ -7,6 +7,7 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  overflow-y: auto;
 }
 
 .teamScores {
@@ -50,7 +51,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
-  font-weight: bold
+  font-weight: bold;
+  font-size: 10px;
 }
 
 .score {
@@ -68,27 +70,44 @@
   color: white;
   border: none;
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  font-size: 12px;
   cursor: pointer;
   margin: 0 10px;
 }
 
 .counter span {
-  width: 30px;
+  width: 15px;
   text-align: center;
+  font-size: 12px;
 }
 .resetButton {
-  margin-top: 20px;
+  margin-top: 10px;
   padding: 10px 20px;
   background-color: #f44336;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 10px;
 }
 
 .resetButton:hover {
   background-color: #d32f2f;
+}
+
+.backButton {
+  margin-bottom: 5px;
+  padding: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.backButton:hover {
+  background-color: #0056b3;
 }

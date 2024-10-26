@@ -25,12 +25,17 @@ export default function Home() {
         }
       });
 
+      // Sort player names alphabetically
+      teamAPlayers.sort();
+      teamBPlayers.sort();
+
       setTeamA(teamAPlayers);
       setTeamB(teamBPlayers);
     };
 
     fetchPlayers();
   }, []);
+
 
   const handleAddPlayerA = async () => {
     if (!playerNameA) return;

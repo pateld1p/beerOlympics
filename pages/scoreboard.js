@@ -1,12 +1,18 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import styles from '../styles/Scoreboard.module.css';
+import { useRouter } from 'next/router';
 
 export default function Scoreboard() {
+    const router = useRouter();
   const [teamScores, setTeamScores] = useState({ teamA: 0, teamB: 0 });
   const [playersA, setPlayersA] = useState([]);
   const [playersB, setPlayersB] = useState([]);
+
+  const handleGoBack = () => {
+    router.push('/');
+  };
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -82,34 +88,43 @@ export default function Scoreboard() {
     if (!confirmation) return;
   
     try {
+      // Determine the correct players array based on the team
       const updatedPlayers = team === 'teamA' ? [...playersA] : [...playersB];
+      const teamDocId = team === 'teamA' ? 'Team A' : 'Team B'; // Adjust document ID based on team
+      const teamRef = doc(db, 'teams', teamDocId); // Reference to the correct team document
   
-      // Debug: Log players to be reset
-      console.log(`Resetting scores for players in ${team}:`, updatedPlayers);
-  
-      // Reset player scores to 0
-      for (let player of updatedPlayers) {
-        player.score = 0; // Reset score in local state
-        await updateDoc(doc(db, 'players', player.id), { score: 0 }); // Update Firestore
-      }
-  
-      // Reset team score to 0 in Firestore
-      await updateDoc(doc(db, 'teams', `Team ${team}`), { points: 0 });
-  
-      // Update local state after resetting
-      if (team === 'teamA') {
-        setPlayersA(updatedPlayers); // Update playersA in state
-        setTeamScores(prevScores => ({ ...prevScores, teamA: 0 })); // Reset teamA score
+      // Reset the team score to 0 in Firestore
+      const teamSnapshot = await getDoc(teamRef);
+      if (!teamSnapshot.exists()) {
+        // Create the team document with initial points of 0 if it doesn’t exist
+        await setDoc(teamRef, { points: 0 });
+        console.log(`Created team document for ${teamDocId} with initial points of 0`);
       } else {
-        setPlayersB(updatedPlayers); // Update playersB in state
-        setTeamScores(prevScores => ({ ...prevScores, teamB: 0 })); // Reset teamB score
+        await updateDoc(teamRef, { points: 0 });
+        console.log(`Team ${teamDocId} score reset to 0`);
       }
   
-      alert(`Team ${team} scores have been reset.`);
+      // Reset each player’s score to 0 in Firestore and update local state
+      for (let player of updatedPlayers) {
+        await updateDoc(doc(db, 'players', player.id), { score: 0 });
+        player.score = 0; // Update score in the local state copy
+      }
+  
+      // Update the local state to reflect changes in the UI
+      if (team === 'teamA') {
+        setPlayersA(updatedPlayers); // Reset playersA scores in local state
+        setTeamScores((prevScores) => ({ ...prevScores, teamA: 0 })); // Reset teamA score in state
+      } else {
+        setPlayersB(updatedPlayers); // Reset playersB scores in local state
+        setTeamScores((prevScores) => ({ ...prevScores, teamB: 0 })); // Reset teamB score in state
+      }
+  
+      alert(`Team ${teamDocId} scores have been reset.`);
     } catch (error) {
       console.error('Error resetting scores:', error);
     }
-  };  
+  };
+  
   
 
   // Sort players by score in descending order
@@ -118,50 +133,53 @@ export default function Scoreboard() {
 
   return (
     <div className={styles.container}>
-      <h1>Scoreboard</h1>
-      <div className={styles.teamScores}>
-        <h2>Team A: {teamScores.teamA}</h2>
-        <h2>Team B: {teamScores.teamB}</h2>
-      </div>
-      <div className={styles.playersSection}>
-        <div className={styles.column}>
-          <h3>Team A Players</h3>
-          <ul className={styles.playerList}>
-            {sortedPlayersA.map((player) => (
-              <li key={`A-${player.id}`} className={styles.playerItem}>
-                <div className={styles.playerInfo}>
-                  {player.name}<span className={styles.score}>Score: {player.score || 0}</span>
+      <button onClick={handleGoBack} className={styles.backButton}>Back</button>
+        <div className={styles.container}>
+            <h1>Scoreboard</h1>
+            <div className={styles.teamScores}>
+                <h2>Team A: {teamScores.teamA}</h2>
+                <h2>Team B: {teamScores.teamB}</h2>
+            </div>
+            <div className={styles.playersSection}>
+                <div className={styles.column}>
+                    <ul className={styles.playerList}>
+                        {sortedPlayersA.map((player) => (
+                        <li key={`A-${player.id}`} className={styles.playerItem}>
+                            <div className={styles.playerInfo}>
+                            {player.name}<span className={styles.score}>Score: {player.score || 0}</span>
+                            </div>
+                            <div className={styles.counter}>
+                            <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
+                            <span>{player.drinks}</span>
+                            <button onClick={() => handleDrinkCountChange(player.id, 1)}>+</button>
+                            </div>
+                        </li>
+                        ))}
+                    </ul>
                 </div>
-                <div className={styles.counter}>
-                  <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
-                  <span>{player.drinks}</span>
-                  <button onClick={() => handleDrinkCountChange(player.id, 1)}>+</button>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => handleResetScore('A')} className={styles.resetButton}>Reset Team A Scores</button>
-        </div>
 
-        <div className={styles.column}>
-          <h3>Team B Players</h3>
-          <ul className={styles.playerList}>
-            {sortedPlayersB.map((player) => (
-              <li key={`B-${player.id}`} className={styles.playerItem}>
-                <div className={styles.playerInfo}>
-                  {player.name}<span className={styles.score}>Score: {player.score || 0}</span>
+                <div className={styles.column}>
+                    <ul className={styles.playerList}>
+                        {sortedPlayersB.map((player) => (
+                        <li key={`B-${player.id}`} className={styles.playerItem}>
+                            <div className={styles.playerInfo}>
+                            {player.name}<span className={styles.score}>Score: {player.score || 0}</span>
+                            </div>
+                            <div className={styles.counter}>
+                            <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
+                            <span>{player.drinks}</span>
+                            <button onClick={() => handleDrinkCountChange(player.id, 1)}>+</button>
+                            </div>
+                        </li>
+                        ))}
+                    </ul>
                 </div>
-                <div className={styles.counter}>
-                  <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
-                  <span>{player.drinks}</span>
-                  <button onClick={() => handleDrinkCountChange(player.id, 1)}>+</button>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <button onClick={() => handleResetScore('B')} className={styles.resetButton}>Reset Team B Scores</button>
+            </div>
+            <div className={styles.resetWrapper}>
+                <button onClick={() => handleResetScore('teamA')} className={styles.resetButton}>Reset Team A Scores</button>
+                <button onClick={() => handleResetScore('teamB')} className={styles.resetButton}>Reset Team B Scores</button>
+            </div>
         </div>
-      </div>
     </div>
   );
 }

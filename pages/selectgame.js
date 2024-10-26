@@ -39,12 +39,17 @@ export default function SelectGame() {
         }
       });
 
+      // Sort players alphabetically by name
+      teamA.sort((a, b) => a.name.localeCompare(b.name));
+      teamB.sort((a, b) => a.name.localeCompare(b.name));
+
       setTeamAPlayers(teamA);
       setTeamBPlayers(teamB);
     };
 
     fetchPlayers();
   }, []);
+
 
   const handleSelectGame = (game) => {
     setSelectedGame(game);
@@ -102,7 +107,6 @@ export default function SelectGame() {
         Confirm Game
       </button>
 
-      {/* Modal for selecting players */}
       {showModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>

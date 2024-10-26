@@ -5,7 +5,7 @@ import styles from '../styles/Scoreboard.module.css';
 import { useRouter } from 'next/router';
 
 export default function Scoreboard() {
-    const router = useRouter();
+  const router = useRouter();
   const [teamScores, setTeamScores] = useState({ teamA: 0, teamB: 0 });
   const [playersA, setPlayersA] = useState([]);
   const [playersB, setPlayersB] = useState([]);
@@ -81,7 +81,6 @@ export default function Scoreboard() {
       console.error('Error updating drinks count:', error);
     }
   };
-  
 
   const handleResetScore = async (team) => {
     const confirmation = window.confirm(`Are you sure you want to reset all scores for Team ${team}?`);
@@ -124,62 +123,60 @@ export default function Scoreboard() {
       console.error('Error resetting scores:', error);
     }
   };
-  
-  
 
-  // Sort players by score in descending order
-  const sortedPlayersA = [...playersA].sort((a, b) => (b.score || 0) - (a.score || 0));
-  const sortedPlayersB = [...playersB].sort((a, b) => (b.score || 0) - (a.score || 0));
+  // Sort players alphabetically by name
+  const sortedPlayersA = [...playersA].sort((a, b) => a.name.localeCompare(b.name));
+  const sortedPlayersB = [...playersB].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
     <div className={styles.container}>
       <button onClick={handleGoBack} className={styles.backButton}>Back</button>
-        <div className={styles.container}>
-            <h1>Scoreboard</h1>
-            <div className={styles.teamScores}>
-                <h2>Team A: {teamScores.teamA}</h2>
-                <h2>Team B: {teamScores.teamB}</h2>
-            </div>
-            <div className={styles.playersSection}>
-                <div className={styles.column}>
-                    <ul className={styles.playerList}>
-                        {sortedPlayersA.map((player) => (
-                        <li key={`A-${player.id}`} className={styles.playerItem}>
-                            <div className={styles.playerInfo}>
-                            {player.name}<span className={styles.score}>Score: {player.score || 0}</span>
-                            </div>
-                            <div className={styles.counter}>
-                            <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
-                            <span>{player.drinks}</span>
-                            <button onClick={() => handleDrinkCountChange(player.id, 1)}>+</button>
-                            </div>
-                        </li>
-                        ))}
-                    </ul>
-                </div>
-
-                <div className={styles.column}>
-                    <ul className={styles.playerList}>
-                        {sortedPlayersB.map((player) => (
-                        <li key={`B-${player.id}`} className={styles.playerItem}>
-                            <div className={styles.playerInfo}>
-                            {player.name}<span className={styles.score}>Score: {player.score || 0}</span>
-                            </div>
-                            <div className={styles.counter}>
-                            <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
-                            <span>{player.drinks}</span>
-                            <button onClick={() => handleDrinkCountChange(player.id, 1)}>+</button>
-                            </div>
-                        </li>
-                        ))}
-                    </ul>
-                </div>
-            </div>
-            <div className={styles.resetWrapper}>
-                <button onClick={() => handleResetScore('teamA')} className={styles.resetButton}>Reset Team A Scores</button>
-                <button onClick={() => handleResetScore('teamB')} className={styles.resetButton}>Reset Team B Scores</button>
-            </div>
+      <div className={styles.container}>
+        <h1>Scoreboard</h1>
+        <div className={styles.teamScores}>
+          <h2>Team A: {teamScores.teamA}</h2>
+          <h2>Team B: {teamScores.teamB}</h2>
         </div>
+        <div className={styles.playersSection}>
+          <div className={styles.column}>
+            <ul className={styles.playerList}>
+              {sortedPlayersA.map((player) => (
+                <li key={`A-${player.id}`} className={styles.playerItem}>
+                  <div className={styles.playerInfo}>
+                    {player.name} <span className={styles.score}>Score: {player.score || 0}</span>
+                  </div>
+                  <div className={styles.counter}>
+                    <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
+                    <span>{player.drinks}</span>
+                    <button onClick={() => handleDrinkCountChange(player.id, 1)}>+</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className={styles.column}>
+            <ul className={styles.playerList}>
+              {sortedPlayersB.map((player) => (
+                <li key={`B-${player.id}`} className={styles.playerItem}>
+                  <div className={styles.playerInfo}>
+                    {player.name} <span className={styles.score}>Score: {player.score || 0}</span>
+                  </div>
+                  <div className={styles.counter}>
+                    <button onClick={() => handleDrinkCountChange(player.id, -1)}>-</button>
+                    <span>{player.drinks}</span>
+                    <button onClick={() => handleDrinkCountChange(player.id, 1)}>+</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+        <div className={styles.resetWrapper}>
+          <button onClick={() => handleResetScore('teamA')} className={styles.resetButton}>Reset Team A Scores</button>
+          <button onClick={() => handleResetScore('teamB')} className={styles.resetButton}>Reset Team B Scores</button>
+        </div>
+      </div>
     </div>
   );
 }

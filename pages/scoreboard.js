@@ -61,16 +61,12 @@ export default function Scoreboard() {
       if (playerIndexA !== -1) {
         const updatedPlayersA = [...playersA];
         const currentDrinksA = updatedPlayersA[playerIndexA].drinks || 0;
-        
-        // Check to avoid negative drinks count
         updatedPlayersA[playerIndexA].drinks = Math.max(currentDrinksA + change, 0);
         setPlayersA(updatedPlayersA);
         await updateDoc(doc(db, 'players', playerId), { drinks: updatedPlayersA[playerIndexA].drinks });
       } else if (playerIndexB !== -1) {
         const updatedPlayersB = [...playersB];
         const currentDrinksB = updatedPlayersB[playerIndexB].drinks || 0;
-  
-        // Check to avoid negative drinks count
         updatedPlayersB[playerIndexB].drinks = Math.max(currentDrinksB + change, 0);
         setPlayersB(updatedPlayersB);
         await updateDoc(doc(db, 'players', playerId), { drinks: updatedPlayersB[playerIndexB].drinks });
@@ -82,46 +78,9 @@ export default function Scoreboard() {
     }
   };
 
-  const handleResetScore = async (team) => {
-    const confirmation = window.confirm(`Are you sure you want to reset all scores for Team ${team}?`);
-    if (!confirmation) return;
-  
-    try {
-      // Determine the correct players array based on the team
-      const updatedPlayers = team === 'teamA' ? [...playersA] : [...playersB];
-      const teamDocId = team === 'teamA' ? 'Team A' : 'Team B'; // Adjust document ID based on team
-      const teamRef = doc(db, 'teams', teamDocId); // Reference to the correct team document
-  
-      // Reset the team score to 0 in Firestore
-      const teamSnapshot = await getDoc(teamRef);
-      if (!teamSnapshot.exists()) {
-        // Create the team document with initial points of 0 if it doesn’t exist
-        await setDoc(teamRef, { points: 0 });
-        console.log(`Created team document for ${teamDocId} with initial points of 0`);
-      } else {
-        await updateDoc(teamRef, { points: 0 });
-        console.log(`Team ${teamDocId} score reset to 0`);
-      }
-  
-      // Reset each player’s score to 0 in Firestore and update local state
-      for (let player of updatedPlayers) {
-        await updateDoc(doc(db, 'players', player.id), { score: 0 });
-        player.score = 0; // Update score in the local state copy
-      }
-  
-      // Update the local state to reflect changes in the UI
-      if (team === 'teamA') {
-        setPlayersA(updatedPlayers); // Reset playersA scores in local state
-        setTeamScores((prevScores) => ({ ...prevScores, teamA: 0 })); // Reset teamA score in state
-      } else {
-        setPlayersB(updatedPlayers); // Reset playersB scores in local state
-        setTeamScores((prevScores) => ({ ...prevScores, teamB: 0 })); // Reset teamB score in state
-      }
-  
-      alert(`Team ${teamDocId} scores have been reset.`);
-    } catch (error) {
-      console.error('Error resetting scores:', error);
-    }
+  // Function to calculate total points for each team
+  const calculateTotalPoints = (teamScore, players) => {
+    return teamScore + players.reduce((sum, player) => sum + (player.score || 0) + (player.drinks || 0), 0);
   };
 
   // Sort players alphabetically by name
@@ -139,6 +98,9 @@ export default function Scoreboard() {
         </div>
         <div className={styles.playersSection}>
           <div className={styles.column}>
+            <div className={styles.totalPoints}>
+              Total Points: {calculateTotalPoints(teamScores.teamA, sortedPlayersA)}
+            </div>
             <ul className={styles.playerList}>
               {sortedPlayersA.map((player) => (
                 <li key={`A-${player.id}`} className={styles.playerItem}>
@@ -156,6 +118,9 @@ export default function Scoreboard() {
           </div>
 
           <div className={styles.column}>
+            <div className={styles.totalPoints}>
+              Total Points: {calculateTotalPoints(teamScores.teamB, sortedPlayersB)}
+            </div>
             <ul className={styles.playerList}>
               {sortedPlayersB.map((player) => (
                 <li key={`B-${player.id}`} className={styles.playerItem}>
@@ -171,10 +136,6 @@ export default function Scoreboard() {
               ))}
             </ul>
           </div>
-        </div>
-        <div className={styles.resetWrapper}>
-          <button onClick={() => handleResetScore('teamA')} className={styles.resetButton}>Reset Team A Scores</button>
-          <button onClick={() => handleResetScore('teamB')} className={styles.resetButton}>Reset Team B Scores</button>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 .container {
-  padding: 20px;
+  padding: 15px;
   background-color: #333;
   color: white;
   text-align: center;
@@ -11,7 +11,7 @@
 }
 
 .teamScores {
-  margin-bottom: 20px;
+  margin-bottom: 5px;
   display: flex;
   justify-content: space-around;
 }
@@ -110,4 +110,9 @@
 
 .backButton:hover {
   background-color: #0056b3;
+}
+.totalPoints {
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
 }

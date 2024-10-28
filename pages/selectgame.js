@@ -1,22 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';  // Import useRouter from Next.js
 import { collection, getDocs } from "firebase/firestore";
 import { db } from '../lib/firebase';
+import { useRouter } from 'next/router';
 import styles from '../styles/Game.module.css';
 
 export default function SelectGame() {
-  const router = useRouter();  // Initialize router
-
-  const games = [
-    "Keg Relay Race",
-    "Beer Pong Gauntlet",
-    "Brewskis and Balance",
-    "Flip Cup Frenzy",
-    "Brewmaster's Challenge",
-    "Stein Sprint",
-    "Drunken Dodgeball"
-  ];
-
+  const router = useRouter();
+  const [games, setGames] = useState([]);
   const [selectedGame, setSelectedGame] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [teamAPlayers, setTeamAPlayers] = useState([]);
@@ -50,9 +40,25 @@ export default function SelectGame() {
     fetchPlayers();
   }, []);
 
+  // Fetch games from Firebase
+  useEffect(() => {
+    const fetchGames = async () => {
+      const gamesCollection = collection(db, "selectGame");
+      const gamesSnapshot = await getDocs(gamesCollection);
+      const gamesData = gamesSnapshot.docs.map(doc => ({
+        id: doc.id,
+        name: doc.id,
+        teamPoints: doc.data().teamPoints,
+        individualPoints: doc.data().individualPoints
+      }));
+      setGames(gamesData);
+    };
 
-  const handleSelectGame = (game) => {
-    setSelectedGame(game);
+    fetchGames();
+  }, []);
+
+  const handleSelectGame = (gameId) => {
+    setSelectedGame(gameId);
   };
 
   const handleConfirmGame = () => {
@@ -60,8 +66,7 @@ export default function SelectGame() {
       setShowModal(true);  // Open the modal to select players
     }
   };
-
-  const handlePlayerSelection = (player) => {
+const handlePlayerSelection = (player) => {
     if (selectedPlayers.includes(player)) {
       setSelectedPlayers(selectedPlayers.filter((p) => p !== player));
     } else {
@@ -80,22 +85,17 @@ export default function SelectGame() {
       }
     });
   };
-
-  return (
+ return (
     <div className={styles.container}>
       <h2 className={styles.title}>Select a Game</h2>
       <ul className={styles.gameList}>
-        {games.map((game, index) => (
+        {games.map((game) => (
           <li
-            key={index}
-            className={`${styles.gameItem} ${selectedGame === game ? styles.selected : ''}`}  // Apply 'selected' class if selected
-            onClick={() => handleSelectGame(game)}  // Handle game selection on click
-            onTouchEnd={(e) => {
-              e.preventDefault();  // Ensure the touch event is processed
-              handleSelectGame(game);  // Handle game selection on touch
-            }}
+            key={game.id}
+            className={`${styles.gameItem} ${selectedGame === game.id ? styles.selected : ''}`}
+            onClick={() => handleSelectGame(game.id)}
           >
-            {game}
+            {game.name}
           </li>
         ))}
       </ul>
@@ -107,7 +107,7 @@ export default function SelectGame() {
         Confirm Game
       </button>
 
-      {showModal && (
+     {showModal && (
         <div className={styles.modal}>
           <div className={styles.modalContent}>
             <h3>Select Players for {selectedGame}</h3>

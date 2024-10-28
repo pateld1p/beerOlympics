@@ -6,32 +6,42 @@ import styles from '../styles/Game.module.css';
 
 export default function SelectWinner() {
   const router = useRouter();
-  const { game, playersA, playersB } = router.query; // Get the game name, players from query params
+  const { game, playersA, playersB } = router.query;
   const [winner, setWinner] = useState(null);
+  const [gameData, setGameData] = useState(null); // Store individual and team points for the game
 
   const playersAList = playersA ? JSON.parse(playersA) : [];
   const playersBList = playersB ? JSON.parse(playersB) : [];
+
+  useEffect(() => {
+    const fetchGameData = async () => {
+      if (game) {
+        const gameRef = doc(db, "selectGame", game); // Get game data from Firestore
+        const gameSnapshot = await getDoc(gameRef);
+        if (gameSnapshot.exists()) {
+          setGameData(gameSnapshot.data());
+        } else {
+          console.error("Game data not found!");
+        }
+      }
+    };
+    fetchGameData();
+  }, [game]);
 
   const handleWinnerSelection = (team) => {
     setWinner(team);
   };
 
-  const updateTeamPoints = async (team) => {
+  const updateTeamPoints = async (team, points) => {
     try {
-      // Reference to the team's document
       const teamRef = doc(db, "teams", team);
-
-      // Fetch the current points for the team
       const teamSnapshot = await getDoc(teamRef);
       if (teamSnapshot.exists()) {
         const currentPoints = teamSnapshot.data().points || 0;
-
-        // Increment the points by 1
         await updateDoc(teamRef, {
-          points: currentPoints + 1,
+          points: currentPoints + points,
         });
-
-        console.log(`${team} points updated to ${currentPoints + 1}`);
+        console.log(`${team} points updated to ${currentPoints + points}`);
       } else {
         console.log("Team not found");
       }
@@ -40,21 +50,19 @@ export default function SelectWinner() {
     }
   };
 
-  const updatePlayerScores = async (players, team) => {
+  const updatePlayerScores = async (players, individualPoints) => {
     try {
       for (const player of players) {
-        // Query Firestore to find the player document by name
         const playersRef = collection(db, "players");
         const q = query(playersRef, where("name", "==", player.name));
         const querySnapshot = await getDocs(q);
   
         querySnapshot.forEach(async (doc) => {
-          // For each player document, fetch the current score and increment it
           const currentScore = doc.data().score || 0;
           await updateDoc(doc.ref, {
-            score: currentScore + 1, // Increment the score by 1
+            score: currentScore + individualPoints,
           });
-          console.log(`${player.name}'s score updated to ${currentScore + 1}`);
+          console.log(`${player.name}'s score updated to ${currentScore + individualPoints}`);
         });
       }
     } catch (error) {
@@ -63,8 +71,8 @@ export default function SelectWinner() {
   };
 
   const handleConfirmWinner = async () => {
-    if (!winner) return;
-  
+    if (!winner || !gameData) return;
+
     try {
       // Save the game result
       await addDoc(collection(db, "games"), {
@@ -74,29 +82,26 @@ export default function SelectWinner() {
         timestamp: serverTimestamp(),
         winner: winner,
       });
-  
-      // Update the winning team's points
-      await updateTeamPoints(winner);
-  
-      // Update individual player scores
+
+      // Award individual points to both teams' players
+      const { individualPoints, teamPoints } = gameData;
+      await updatePlayerScores(playersAList, individualPoints);
+      await updatePlayerScores(playersBList, individualPoints);
+
+      // Update team points only for the winning team
       if (winner === "Team A") {
-        await updatePlayerScores(playersAList, "A");
+        await updateTeamPoints("Team A", teamPoints);
       } else if (winner === "Team B") {
-        await updatePlayerScores(playersBList, "B");
+        await updateTeamPoints("Team B", teamPoints);
       }
-  
-      // Display an alert after the winner is confirmed
+
       alert(`The winner has been recorded! ${winner} is the winning team.`);
-  
-      // Redirect to homepage after the alert
       router.push('/');
-  
     } catch (error) {
       console.error('Error saving the game result:', error);
       alert('Error occurred while saving the result. Please try again.');
     }
   };
-  
 
   return (
     <div className={styles.container}>
@@ -145,11 +150,10 @@ export default function SelectWinner() {
         </button>
       </div>
 
-      
       <button
         className={styles.confirmButton}
         onClick={handleConfirmWinner}
-        disabled={!winner}
+        disabled={!winner || !gameData} // Disable until gameData is fetched
       >
         Confirm Winner
       </button>

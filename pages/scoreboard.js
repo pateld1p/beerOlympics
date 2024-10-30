@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, getDocs, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, doc, updateDoc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import styles from '../styles/Scoreboard.module.css';
 import { useRouter } from 'next/router';
@@ -82,49 +82,6 @@ export default function Scoreboard() {
   const calculateTotalPoints = (teamScore, players) => {
     return teamScore + players.reduce((sum, player) => sum + (player.score || 0) + (player.drinks || 0), 0);
   };
-
-  const handleResetScore = async (team) => {
-    const confirmation = window.confirm(`Are you sure you want to reset all scores for Team ${team}?`);
-    if (!confirmation) return;
-  
-    try {
-      // Determine the correct players array based on the team
-      const updatedPlayers = team === 'teamA' ? [...playersA] : [...playersB];
-      const teamDocId = team === 'teamA' ? 'Team A' : 'Team B'; // Adjust document ID based on team
-      const teamRef = doc(db, 'teams', teamDocId); // Reference to the correct team document
-  
-      // Reset the team score to 0 in Firestore
-      const teamSnapshot = await getDoc(teamRef);
-      if (!teamSnapshot.exists()) {
-        // Create the team document with initial points of 0 if it doesn’t exist
-        await setDoc(teamRef, { points: 0 });
-        console.log(`Created team document for ${teamDocId} with initial points of 0`);
-      } else {
-        await updateDoc(teamRef, { points: 0 });
-        console.log(`Team ${teamDocId} score reset to 0`);
-      }
-  
-      // Reset each player’s score to 0 in Firestore and update local state
-      for (let player of updatedPlayers) {
-        await updateDoc(doc(db, 'players', player.id), { score: 0 });
-        player.score = 0; // Update score in the local state copy
-      }
-  
-      // Update the local state to reflect changes in the UI
-      if (team === 'teamA') {
-        setPlayersA(updatedPlayers); // Reset playersA scores in local state
-        setTeamScores((prevScores) => ({ ...prevScores, teamA: 0 })); // Reset teamA score in state
-      } else {
-        setPlayersB(updatedPlayers); // Reset playersB scores in local state
-        setTeamScores((prevScores) => ({ ...prevScores, teamB: 0 })); // Reset teamB score in state
-      }
-  
-      alert(`Team ${teamDocId} scores have been reset.`);
-    } catch (error) {
-      console.error('Error resetting scores:', error);
-    }
-  };
-
   // Sort players alphabetically by name
   const sortedPlayersA = [...playersA].sort((a, b) => a.name.localeCompare(b.name));
   const sortedPlayersB = [...playersB].sort((a, b) => a.name.localeCompare(b.name));
@@ -179,12 +136,6 @@ export default function Scoreboard() {
             </ul>
           </div>
         </div>
-        {/*
-        <div className={styles.resetWrapper}>
-          <button onClick={() => handleResetScore('teamA')} className={styles.resetButton}>Reset Team A Scores</button>
-          <button onClick={() => handleResetScore('teamB')} className={styles.resetButton}>Reset Team B Scores</button>
-        </div>
-        */}
       </div>
     </div>
   );

@@ -1,0 +1,45 @@
+.container {
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  
+  .backButton {
+    background-color: #0070f3;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+  }
+  
+  .logTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  .logTable th, .logTable td {
+    padding: 12px;
+    border: 1px solid #838383;
+    text-align: left;
+  }
+  
+  .logTable th {
+    background-color: #171616;
+    color: rgb(171, 117, 117);
+    font-weight: bold;
+  }
+  
+  .logTable td {
+    background-color: #363535;
+  }
+  
+  .winnerHighlight {
+    background-color: #1c231d;
+    color: #37b253;
+    font-weight: bold;
+  }
+  

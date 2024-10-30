@@ -121,8 +121,11 @@ export default function Home() {
         </div>
       </div>
       <div className={styles.selectGameWrapper}>
-        <a href="/selectgame" target="_blank" className={styles.selectGameButton}>Select Game</a>
         <a href="/scoreboard" className={styles.scoreboardButton}>Scoreboard</a>
+        <a href="/selectgame" target="_blank" className={styles.selectGameButton}>Select Game</a>
+      </div>
+      <div>
+      <a href="/admin" target="_blank" className={styles.adminButton}>Admin Controls</a>
       </div>
     </div>
   );

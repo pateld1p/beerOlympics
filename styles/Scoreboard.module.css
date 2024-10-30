@@ -111,6 +111,20 @@
 .backButton:hover {
   background-color: #0056b3;
 }
+.logButton {
+  margin-bottom: 5px;
+  padding: 5px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.logButton:hover {
+  background-color: #0056b3;
+}
 .totalPoints {
   font-weight: bold;
   margin-top: 10px;

@@ -95,3 +95,15 @@
   border-radius: 5px;
   cursor: pointer;
 }
+
+.adminButton{
+  display: inline-block;
+  margin: 10px;
+  padding: 15px 30px;
+  background-color: #720101;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+

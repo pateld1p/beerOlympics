@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, doc, getDoc, updateDoc, addDoc, serverTimestamp, query, where, getDocs } from "firebase/firestore";
+import { collection, doc, getDoc, updateDoc, addDoc, serverTimestamp, query, where, getDocs, setDoc } from "firebase/firestore";
 import { db } from '../lib/firebase';
 import { useRouter } from 'next/router';
 import styles from '../styles/Game.module.css';
@@ -8,7 +8,7 @@ export default function SelectWinner() {
   const router = useRouter();
   const { game, playersA, playersB } = router.query;
   const [winner, setWinner] = useState(null);
-  const [gameData, setGameData] = useState(null); // Store individual and team points for the game
+  const [gameData, setGameData] = useState(null);
 
   const playersAList = playersA ? JSON.parse(playersA) : [];
   const playersBList = playersB ? JSON.parse(playersB) : [];
@@ -16,7 +16,7 @@ export default function SelectWinner() {
   useEffect(() => {
     const fetchGameData = async () => {
       if (game) {
-        const gameRef = doc(db, "selectGame", game); // Get game data from Firestore
+        const gameRef = doc(db, "selectGame", game); // Fetch game data from Firestore
         const gameSnapshot = await getDoc(gameRef);
         if (gameSnapshot.exists()) {
           setGameData(gameSnapshot.data());
@@ -50,19 +50,35 @@ export default function SelectWinner() {
     }
   };
 
-  const updatePlayerScores = async (players, individualPoints) => {
+  const updatePlayerScores = async (players, gameName, individualPoints) => {
     try {
       for (const player of players) {
         const playersRef = collection(db, "players");
         const q = query(playersRef, where("name", "==", player.name));
         const querySnapshot = await getDocs(q);
   
-        querySnapshot.forEach(async (doc) => {
-          const currentScore = doc.data().score || 0;
-          await updateDoc(doc.ref, {
+        querySnapshot.forEach(async (playerDoc) => {
+          const currentScore = playerDoc.data().score || 0;
+          await updateDoc(playerDoc.ref, {
             score: currentScore + individualPoints,
           });
-          console.log(`${player.name}'s score updated to ${currentScore + individualPoints}`);
+          console.log(`${player.name}'s cumulative score updated to ${currentScore + individualPoints}`);
+  
+          const gameRef = doc(db, "players", playerDoc.id, "games", gameName);
+  
+          // Ensure the game document exists in the player's 'games' subcollection with an initial score of 0
+          await setDoc(gameRef, { score: 0 }, { merge: true });
+  
+          // Fetch the game document's current score after ensuring it exists
+          const gameSnapshot = await getDoc(gameRef);
+          const currentGameScore = gameSnapshot.exists() ? gameSnapshot.data().score : 0;
+  
+          // Update the score for the specific game by adding individual points
+          await updateDoc(gameRef, {
+            score: currentGameScore + individualPoints,
+          });
+  
+          console.log(`${player.name}'s score for ${gameName} updated to ${currentGameScore + individualPoints}`);
         });
       }
     } catch (error) {
@@ -85,8 +101,8 @@ export default function SelectWinner() {
 
       // Award individual points to both teams' players
       const { individualPoints, teamPoints } = gameData;
-      await updatePlayerScores(playersAList, individualPoints);
-      await updatePlayerScores(playersBList, individualPoints);
+      await updatePlayerScores(playersAList, game, individualPoints);
+      await updatePlayerScores(playersBList, game, individualPoints);
 
       // Update team points only for the winning team
       if (winner === "Team A") {

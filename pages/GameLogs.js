@@ -4,6 +4,9 @@ import { db } from '../lib/firebase';
 import styles from '../styles/GameLogs.module.css';
 import { useRouter } from 'next/router';
 
+// team A = Green
+// team B = Blue
+
 export default function GameLogs() {
   const [gameLogs, setGameLogs] = useState([]);
   const router = useRouter();
@@ -40,8 +43,8 @@ export default function GameLogs() {
             <tr>
               <th>Date/Time</th>
               <th>Game Name</th>
-              <th>Team A</th>
-              <th>Team B</th>
+              <th>Team Green</th>
+              <th>Team Blue</th>
             </tr>
           </thead>
           <tbody>

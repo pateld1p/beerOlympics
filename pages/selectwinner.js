@@ -4,6 +4,9 @@ import { db } from '../lib/firebase';
 import { useRouter } from 'next/router';
 import styles from '../styles/Game.module.css';
 
+// team A = Green
+// team B = Blue
+
 export default function SelectWinner() {
   const router = useRouter();
   const { game, playersA, playersB } = router.query;
@@ -125,7 +128,7 @@ export default function SelectWinner() {
 
       <div className={styles.playersSection}>
         <div className={styles.teamPlayers}>
-          <h3>Team A Players</h3>
+          <h3>Team Green Players</h3>
           <ul className={styles.playerList}>
             {playersAList.map((player, index) => (
               <li key={index}>{player.name}</li>  
@@ -134,7 +137,7 @@ export default function SelectWinner() {
         </div>
 
         <div className={styles.teamPlayers}>
-          <h3>Team B Players</h3>
+          <h3>Team Blue Players</h3>
           <ul className={styles.playerList}>
             {playersBList.map((player, index) => (
               <li key={index}>{player.name}</li>  
@@ -152,7 +155,7 @@ export default function SelectWinner() {
             handleWinnerSelection('Team A');
           }}
         >
-          Team A
+          Team Green
         </button>
         <button
           className={`${styles.teamButton} ${winner === 'Team B' ? styles.selected : ''}`}
@@ -162,7 +165,7 @@ export default function SelectWinner() {
             handleWinnerSelection('Team B');
           }}
         >
-          Team B
+          Team Blue
         </button>
       </div>
 

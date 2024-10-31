@@ -3,6 +3,9 @@ import { collection, getDocs, addDoc } from "firebase/firestore";
 import { db } from '../lib/firebase';
 import styles from '../styles/Home.module.css';
 
+// team A = Green
+// team B = Blue
+
 export default function Home() {
   const [teamA, setTeamA] = useState([]);
   const [teamB, setTeamB] = useState([]);
@@ -75,7 +78,7 @@ export default function Home() {
     <div className={styles.container}>
       <div className={styles.teams}>
         <div className={styles.teamColumn}>
-          <h2 className={styles.teamTitle}>Team A</h2>
+          <h2 className={styles.teamTitle}>Team Green <sup style = {{fontSize: '0.5em'}}>A</sup></h2>
           <ul className={styles.playerList}>
             {teamA.map((player, index) => <li key={index} className={styles.playerItem}>{player}</li>)}
           </ul>
@@ -98,7 +101,7 @@ export default function Home() {
         </div>
 
         <div className={styles.teamColumn}>
-          <h2 className={styles.teamTitle}>Team B</h2>
+          <h2 className={styles.teamTitle}>Team Blue <sup style = {{fontSize: '0.5em'}}>B</sup></h2>
           <ul className={styles.playerList}>
             {teamB.map((player, index) => <li key={index} className={styles.playerItem}>{player}</li>)}
           </ul>
@@ -125,7 +128,7 @@ export default function Home() {
         <a href="/selectgame" target="_blank" className={styles.selectGameButton}>Select Game</a>
       </div>
       <div>
-      <a href="/admin" target="_blank" className={styles.adminButton}>Admin Controls</a>
+      <a href="/admin" className={styles.adminButton}>Admin Controls</a>
       </div>
     </div>
   );

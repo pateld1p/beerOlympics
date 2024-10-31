@@ -4,6 +4,10 @@ import { db } from '../lib/firebase';
 import styles from '../styles/Scoreboard.module.css';
 import { useRouter } from 'next/router';
 
+
+// team A = Green
+// team B = Blue
+
 export default function Scoreboard() {
   const router = useRouter();
   const [teamScores, setTeamScores] = useState({ teamA: 0, teamB: 0 });
@@ -92,8 +96,8 @@ export default function Scoreboard() {
       <div className={styles.container}>
         <h1>Scoreboard</h1>
         <div className={styles.teamScores}>
-          <h2>Team A: {teamScores.teamA}</h2>
-          <h2>Team B: {teamScores.teamB}</h2>
+          <h2>Team Green: {teamScores.teamA}</h2>
+          <h2>Team Blue: {teamScores.teamB}</h2>
         </div>
         <div className={styles.playersSection}>
           <div className={styles.column}>

@@ -4,6 +4,9 @@ import { db } from '../lib/firebase';
 import { useRouter } from 'next/router';
 import styles from '../styles/Game.module.css';
 
+// team A = Green
+// team B = Blue
+
 export default function SelectGame() {
   const router = useRouter();
   const [games, setGames] = useState([]);
@@ -113,7 +116,7 @@ const handlePlayerSelection = (player) => {
             <h3>Select Players for {selectedGame}</h3>
             <div className={styles.teamColumns}>
               <div className={styles.teamColumn}>
-                <h4>Team A</h4>
+                <h4>Team Green</h4>
                 <ul className={styles.playerList}>
                   {teamAPlayers.map((player, index) => (
                     <li key={index}>
@@ -131,7 +134,7 @@ const handlePlayerSelection = (player) => {
               </div>
 
               <div className={styles.teamColumn}>
-                <h4>Team B</h4>
+                <h4>Team Blue</h4>
                 <ul className={styles.playerList}>
                   {teamBPlayers.map((player, index) => (
                     <li key={index}>

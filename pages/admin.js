@@ -4,6 +4,9 @@ import { doc, updateDoc, setDoc, getDoc, collection, getDocs, deleteDoc } from '
 import { db } from '../lib/firebase';
 import styles from '../styles/Admin.module.css';
 
+// team A = Green
+// team B = Blue
+
 export default function Admin() {
   const router = useRouter();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -119,10 +122,10 @@ export default function Admin() {
         View Game Logs
       </button>
       <button onClick={() => handleResetTeamScore('Team A')} className={styles.controlButton}>
-        Reset Team A Scores
+        Reset Team Green Scores
       </button>
       <button onClick={() => handleResetTeamScore('Team B')} className={styles.controlButton}>
-        Reset Team B Scores
+        Reset Team Blue Scores
       </button>
       <button onClick={handleClearAllRecords} className={styles.controlButton}>
         Clear All Records
